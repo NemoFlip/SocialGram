@@ -237,4 +237,22 @@ class DataService {
             }
         }
     }
+    func deleteAllPosts(userID: String, handler: @escaping (_ succcess: Bool) -> ()) {
+        REF_POSTS.whereField(DataBasePostField.userID, isEqualTo: userID).getDocuments { snapshot, error in
+            handler(self.deletePostsForSnapshot(snapshot: snapshot))
+        }
+    }
+    private func deletePostsForSnapshot(snapshot: QuerySnapshot?) -> Bool {
+        if let snapshot = snapshot, snapshot.documents.count > 0 {
+            for document in snapshot.documents {
+                let documentID = document.documentID
+                REF_POSTS.document(documentID).delete()
+            }
+            print("Successfully deleted all posts!")
+            return true
+        } else {
+            print("No documents to delete")
+            return false
+        }
+    }
 }

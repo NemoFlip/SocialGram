@@ -11,6 +11,7 @@ struct SettingsView: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
     @State var showError = false
+    @State var showApprovalAlert = false
     @Binding var userDisplayName: String
     @Binding var userBio: String
     @Binding var profilePicture: UIImage
@@ -90,7 +91,6 @@ extension SettingsView {
     }
     private var profileSettingsSection: some View {
         GroupBox {
-            
             NavigationLink {
                 SettingsEditTextView(submissionText: userDisplayName, title: "Display name", settingsEditTextOption: .displayName, description: "You can change your display name here. This will be seen by other users on your profile and on your posts!", placeholder: "Display name...", profileText: $userDisplayName)
             } label: {
@@ -113,7 +113,15 @@ extension SettingsView {
             } label: {
                 SettingsRowView(leftIcon: "message.fill", text: "FeedBack", color: .theme.purpleColor)
             }
-
+            Button {
+                showApprovalAlert.toggle()
+            } label: {
+                SettingsRowView(leftIcon: "person.fill.xmark", text: "Delete account", color: .theme.purpleColor)
+            }.alert(isPresented: $showApprovalAlert) {
+                return Alert(title: Text("Delete account"), message: Text("Confirm deleting your account"),primaryButton: .destructive(Text("Delete"), action: {
+                        // delete account
+                }), secondaryButton: .cancel())
+            }
             Button {
                 signOut()
             } label: {
@@ -121,6 +129,7 @@ extension SettingsView {
             }.alert(isPresented: $showError) {
                 return Alert(title: Text("Error logging out the user"))
             }
+            
         } label: {
             SettingsLabelView(labelText: "Profile", imageName: "person.fill")
         }.padding()
