@@ -23,6 +23,7 @@ struct PostView: View {
     @State var alertMessage = ""
     @State var showAlert = false
     @State var showApproveAlert = false
+    var handler: () -> ()
     enum PostActionSheetOption {
         case generalForCurrentUser
         case generalForPostUser
@@ -109,7 +110,9 @@ struct PostView: View {
 struct PostView_Previews: PreviewProvider {
     static var post = PostModel(postID: "", userID: "", username: "Krider", caption: "This is the caption", dateCreated: Date(), likeCount: 0, likedByUser: false)
     static var previews: some View {
-        PostView(showHeaderAndFooter: true, post: post, addHeartAnimationToView: true)
+        PostView(showHeaderAndFooter: true, post: post, addHeartAnimationToView: true) {
+            
+        }
             .previewLayout(.sizeThatFits)
     }
 }
@@ -145,11 +148,6 @@ extension PostView {
                     .font(.headline)
             }.accentColor(.primary).actionSheet(isPresented: $showActionSheet) {
                 getActionSheet()
-            }.alert(isPresented: $showApproveAlert) {
-                return Alert(title: Text("Approve deleting"), message: Text("You definitely want to delete this post?"), primaryButton: .default(Text("Yes"), action: {
-                    DataService.instance.deletePost(postID: post.postID)
-                    self.presentationMode.wrappedValue.dismiss()
-                }), secondaryButton: .cancel())
             }
         }.padding(6)
     }
@@ -183,7 +181,12 @@ extension PostView {
             } label: {
                 Image(systemName: post.likedByUser ? "heart.fill" : "heart")
                     .scaleEffect(animateFooterLike ? 1.09 : 1)
-            }.accentColor(post.likedByUser ? .red : .primary)
+            }.accentColor(post.likedByUser ? .red : .primary).alert(isPresented: $showApproveAlert) {
+                return Alert(title: Text("Approve deleting"), message: Text("You definitely want to delete this post?"), primaryButton: .default(Text("Yes"), action: {
+                    DataService.instance.deletePost(postID: post.postID)
+                    handler()
+                }), secondaryButton: .cancel())
+            }
             NavigationLink {
                 CommentsView(post: post)
             } label: {

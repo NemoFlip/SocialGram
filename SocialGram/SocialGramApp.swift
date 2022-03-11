@@ -15,7 +15,6 @@ struct SocialGramApp: App {
     init() {
         FirebaseApp.configure()
         
-        
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
     

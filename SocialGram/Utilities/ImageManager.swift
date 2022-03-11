@@ -125,4 +125,16 @@ class ImageManager {
             }
         }
     }
+    func deleteImageByUserID(userID: String) {
+        let path = getProfileImagePath(userID: userID)
+        path.delete { error in
+            if let error = error {
+                print("Error deleting image: \(error)")
+                return
+            } else {
+                print("Successfully deleted image")
+                return
+            }
+        }
+    }
 }

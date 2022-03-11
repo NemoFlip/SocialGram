@@ -21,7 +21,9 @@ struct FeedView: View {
                 }
                 LazyVStack {
                     ForEach(posts.dataArray) {
-                        PostView(showHeaderAndFooter: true, post: $0, addHeartAnimationToView: true)
+                        PostView(showHeaderAndFooter: true, post: $0, addHeartAnimationToView: true) {
+                            posts.getFeedAndBrowsePosts(shuffled: false)
+                        }
                     }
                 }
             }.coordinateSpace(name: "PullToRefresh")

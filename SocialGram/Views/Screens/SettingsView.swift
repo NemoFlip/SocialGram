@@ -6,8 +6,10 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct SettingsView: View {
+    @AppStorage(CurrentUserDefaults.userID) var currentUserID: String?
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
     @State var showError = false
@@ -61,6 +63,25 @@ struct SettingsView: View {
                 print("Error logging out")
                 haptics.notificationOccurred(.error)
                 self.showError.toggle()
+            }
+        }
+    }
+    func deleteAccount() {
+        guard let currentUserID = currentUserID else {
+            return
+        }
+        DataService.instance.deleteAllPosts(userID: currentUserID) { succcess in
+            if succcess {
+                AuthService.instance.deleteUserDocument(userID: currentUserID)
+                let defaultsDictionary = UserDefaults.standard.dictionaryRepresentation()
+                defaultsDictionary.keys.forEach { key in
+                    UserDefaults.standard.removeObject(forKey: key)
+                }
+                
+            
+                print("Successfully deleted Account!")
+            } else {
+                return
             }
         }
     }
@@ -119,7 +140,8 @@ extension SettingsView {
                 SettingsRowView(leftIcon: "person.fill.xmark", text: "Delete account", color: .theme.purpleColor)
             }.alert(isPresented: $showApprovalAlert) {
                 return Alert(title: Text("Delete account"), message: Text("Confirm deleting your account"),primaryButton: .destructive(Text("Delete"), action: {
-                        // delete account
+                        deleteAccount()
+                        self.presentationMode.wrappedValue.dismiss()
                 }), secondaryButton: .cancel())
             }
             Button {

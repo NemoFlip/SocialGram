@@ -96,7 +96,7 @@ struct OnBoardingViewSignIn: View {
                 AuthService.instance.loginUserToApp(userID: userID) { success in
                     if success {
                         print("User logged in")
-        
+                        self.presentationMode.wrappedValue.dismiss()
                     } else {
                         print("Error logging in")
                         self.showError.toggle()

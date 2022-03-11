@@ -39,11 +39,13 @@ class AuthService {
         getUserInfo(forUserID: userID) { name, bio in
             if let name = name, let bio = bio {
                 handler(true)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     UserDefaults.standard.set(userID, forKey: CurrentUserDefaults.userID)
                     UserDefaults.standard.set(bio, forKey: CurrentUserDefaults.bio)
                     UserDefaults.standard.set(name, forKey: CurrentUserDefaults.displayName)
                 }
+                    
+                
             } else {
                 print("Error getting user info for app.")
                 handler(false)
@@ -143,6 +145,21 @@ class AuthService {
                 handler(true)
                 return
                 
+            }
+        }
+    }
+    func deleteUserDocument(userID: String) {
+        REF_USERS.document(userID).delete { error in
+            if let error = error {
+                print(error)
+                return
+            } else {
+                ImageManager.instance.deleteImageByUserID(userID: userID)
+                Auth.auth().currentUser?.delete(completion: { error in
+                    
+                })
+                print("Delete account in firebase")
+                return
             }
         }
     }
