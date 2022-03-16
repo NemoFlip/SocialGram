@@ -19,17 +19,26 @@ class ImageManager {
             self?.uploadImage(path: path, image: image) { _ in }
         }
     }
-    
-    func uploadPostImage(postID: String, image: UIImage, handler: @escaping (_ success: Bool) -> ()) {
-        let path = getPostImagePath(postID: postID)
-        DispatchQueue.global(qos: .userInteractive).async {[weak self] in
-            self?.uploadImage(path: path, image: image) { success in
-                DispatchQueue.main.async {
-                    handler(success)
+    func uploadMultiplePostImages(postID: String, images: [UIImage], handler: @escaping (_ success: Bool) -> ()) {
+        for number in 0..<images.count {
+            let path = getPostImagesPath(postID: postID, num: number + 1)
+            DispatchQueue.global(qos: .userInitiated).sync {
+                self.uploadImage(path: path, image: images[number]) { success in
+                    if !success {
+                        DispatchQueue.main.async {
+                            handler(false)
+                        }
+                        return
+                    }
                 }
+                print("Uploaded image: \(number)")
             }
+            print("Uploaded image2: \(number)")
+            
         }
+        handler(true)
     }
+    
     func downloadProfileImage(userID: String, handler: @escaping (_ image: UIImage?) -> ()) {
         let path = getProfileImagePath(userID: userID)
         DispatchQueue.global(qos: .userInteractive).async {[weak self] in
@@ -40,14 +49,34 @@ class ImageManager {
             }
         }
     }
-    func downloadPostImage(postID: String, handler: @escaping (_ image: UIImage?) -> ()) {
-        let path = getPostImagePath(postID: postID)
-        DispatchQueue.global(qos: .userInteractive).async {[weak self] in
-            self?.downloadImage(path: path) { image in
-                DispatchQueue.main.async {
-                    handler(image)
+    func downloadMultiplePostImages(postID: String, handler: @escaping (_ uiImages: [UIImage]) -> ()) {
+        var resultArray = [UIImage]()
+        let myGroup = DispatchGroup()
+        print("Downloading")
+        for i in 1...5 {
+            myGroup.enter()
+            let path = getPostImagesPath(postID: postID, num: i)
+            DispatchQueue.global(qos: .userInitiated).async {
+                if let cachedImage = imageCache.object(forKey: path) {
+                    resultArray.append(cachedImage)
+                    myGroup.leave()
+                } else {
+                    path.getData(maxSize: 27 * 1024 * 1024) { returnedImageData, error in
+                        if let data = returnedImageData, let image = UIImage(data: data) {
+                            imageCache.setObject(image, forKey: path)
+                            resultArray.append(image)
+                        }
+                        myGroup.leave()
+                    }
                 }
             }
+            
+        }
+        
+        myGroup.notify(queue: .main) {
+            print("ARRAY")
+            print(resultArray)
+            handler(resultArray)
         }
     }
     private func getProfileImagePath(userID: String) -> StorageReference {
@@ -55,8 +84,13 @@ class ImageManager {
         let storagePath = REF_STOR.reference(withPath: userPath)
         return storagePath
     }
-    private func getPostImagePath(postID: String) -> StorageReference {
-        let postPath = "posts/\(postID)/1"
+//    private func getPostImagePath(postID: String) -> StorageReference {
+//        let postPath = "posts/\(postID)/1"
+//        let storagePath = REF_STOR.reference(withPath: postPath)
+//        return storagePath
+//    }
+    private func getPostImagesPath(postID: String, num: Int) -> StorageReference {
+        let postPath = "posts/\(postID)/\(num)"
         let storagePath = REF_STOR.reference(withPath: postPath)
         return storagePath
     }
@@ -105,7 +139,7 @@ class ImageManager {
                     handler(image)
                     return
                 } else {
-                    print("Error getting image")
+//                    print("Error getting image")
                     handler(nil)
                     return
                 }
@@ -113,17 +147,27 @@ class ImageManager {
         }
     }
     func deleteImage(postID: String, handler: @escaping (_ success: Bool) -> ()) {
-        let path = getPostImagePath(postID: postID)
-        path.delete { error in
+        let ref = REF_STOR.reference().child("posts/\(postID)/")
+        ref.listAll { list, error in
             if let error = error {
-                print("Error deleting image: \(error)")
+                print("Error: \(error)")
                 handler(false)
                 return
-            } else {
-                handler(true)
-                return
             }
+            else {
+                list.items.forEach { refer in
+                    refer.delete { error2 in
+                        if let error2 = error2 {
+                            print("Error: \(error2)")
+                            handler(false)
+                            return
+                        }
+                    }
+                }
+            }
+            
         }
+        handler(true)
     }
     func deleteImageByUserID(userID: String) {
         let path = getProfileImagePath(userID: userID)

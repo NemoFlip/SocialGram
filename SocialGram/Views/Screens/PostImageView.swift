@@ -44,7 +44,10 @@ struct PostImageView: View {
         guard let displayName = displayName else {
             return
         }
-        DataService.instance.uploadPost(image: imageSelected, caption: captionText, displayName: displayName, userID: currentUserID) { success in
+        if !multipleImages.contains(imageSelected) {
+            multipleImages.insert(imageSelected, at: 0)
+        }
+        DataService.instance.uploadPost(images: multipleImages, caption: captionText, displayName: displayName, userID: currentUserID) { success in
             postUploadedSuccessfully = success
             showAlert.toggle()
         }
@@ -79,19 +82,30 @@ extension PostImageView {
             Image(systemName: "plus")
                 .font(.title)
                 .padding()
-        }.accentColor(.primary)
+        }
+        .accentColor(.primary)
+        .sheet(isPresented: $showMultipleImagePicker, onDismiss: {
+            if !multipleImages.contains(imageSelected) {
+                multipleImages.append(imageSelected)
+            }
+        }) {
+            MultipleImagePicker(images: $multipleImages, dismissView: $showMultipleImagePicker)
+        }.disabled(multipleImages.count >= 5)
 
     }
     private var imageWithEditor: some View {
-        HStack {
-            Image(uiImage: imageSelected)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 150, height: 100)
-                .cornerRadius(12)
-                .clipped()
-                .padding(.leading, 5)
-           
+        VStack {
+            if multipleImages.isEmpty {
+                DisplayImage(image: imageSelected)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        ForEach(multipleImages, id: \.self) { image in
+                            DisplayImage(image: image)
+                        }
+                    }
+                }
+            }
                 TextEditor(text: $captionText)
                     .padding(5)
                     .background(colorScheme == .light ? Color.theme.beigeColor : .theme.purpleColor)
@@ -100,7 +114,6 @@ extension PostImageView {
                     .padding(5)
                     .font(.headline)
                     .cornerRadius(12)
-                
                     .autocapitalization(.sentences)
         }
     }
@@ -119,5 +132,19 @@ extension PostImageView {
                 .cornerRadius(12)
                 .padding()
         }.accentColor(.theme.yellowColor)
+    }
+}
+
+
+struct DisplayImage: View {
+    var image: UIImage
+    var body: some View {
+        Image(uiImage: image)
+            .resizable()
+            .scaledToFill()
+            .frame(width: 150, height: 100)
+            .cornerRadius(12)
+            .clipped()
+            .padding(.leading, 5)
     }
 }

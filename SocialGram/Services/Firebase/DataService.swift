@@ -14,11 +14,12 @@ class DataService {
     private var REF_REPORTS = DB_BASE.collection("reports")
     private var REF_FEEDBACK = DB_BASE.collection("feedback")
     @AppStorage(CurrentUserDefaults.userID) var currentUserID: String?
-    func uploadPost(image: UIImage, caption: String?, displayName: String, userID: String, handler: @escaping (_ success: Bool) -> ()) {
+    func uploadPost(images: [UIImage], caption: String?, displayName: String, userID: String, handler: @escaping (_ success: Bool) -> ()) {
         let document = REF_POSTS.document()
         let postID = document.documentID
-        ImageManager.instance.uploadPostImage(postID: postID, image: image) { success in
+        ImageManager.instance.uploadMultiplePostImages(postID: postID, images: images) { success in
             if success {
+                print("Uploaded all images")
                 let postData: [String: Any] = [
                     DataBasePostField.displayName : displayName,
                     DataBasePostField.postID : postID,

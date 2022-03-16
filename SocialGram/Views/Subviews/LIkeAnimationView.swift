@@ -15,7 +15,7 @@ struct LIkeAnimationView: View {
                 .foregroundColor(.white)
                 .font(.system(size: 100))
                 .opacity(animate ? 1 : 0)
-                .scaleEffect(animate ? 1 : 0)
+                .scaleEffect(animate ? 1 : 0.1)
         }.animation(.spring(response: 0.5, dampingFraction: 0.6, blendDuration: 1))
     }
 }

@@ -15,7 +15,7 @@ struct MultipleImagePicker: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var config = PHPickerConfiguration()
         config.filter = .images
-        config.selectionLimit = 5
+        config.selectionLimit = images.count == 0 ? 4 : 5 - images.count
         
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = context.coordinator
@@ -28,6 +28,7 @@ struct MultipleImagePicker: UIViewControllerRepresentable {
         }
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             parent.dismissView.toggle()
+            
             for image in results {
                 if image.itemProvider.canLoadObject(ofClass: UIImage.self) {
                     image.itemProvider.loadObject(ofClass: UIImage.self) { resultImage, error in
@@ -42,6 +43,7 @@ struct MultipleImagePicker: UIViewControllerRepresentable {
                     print("Can't load images")
                     return
                 }
+                
             }
         }
     }

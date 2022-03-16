@@ -16,7 +16,7 @@ struct PostView: View {
     @State var animateLike = false
     @State var animateFooterLike = false
     @State var addHeartAnimationToView: Bool
-    @State var postImage: UIImage = UIImage(named: "logo.loading")!
+    @State var postImages = [UIImage(named: "logo.loading")!]
     @State var actionSheetType: PostActionSheetOption = .generalForPostUser
     @State var profileImage: UIImage = UIImage(named: "logo.loading")!
     @State var alertTitle = ""
@@ -97,12 +97,10 @@ struct PostView: View {
                 }
             }
         }
-        ImageManager.instance.downloadPostImage(postID: post.postID) { image in
-            if let image = image {
-                self.postImage = image
-            }
-        }
-        
+        print("GETTING IMAGES")
+        ImageManager.instance.downloadMultiplePostImages(postID: post.postID) { uiImages in
+            self.postImages = uiImages
+        }  
     }
 }
 
@@ -153,16 +151,22 @@ extension PostView {
     }
     private var imageSection: some View {
         ZStack {
-            Image(uiImage: postImage)
-                .resizable()
-                .scaledToFit()
-                .onTapGesture(count: 2) {
-                    if !post.likedByUser {
-                        likePost()
-                        AnalyticsService.instance.likePostDoubleTap()
-                        
-                    }
+            TabView {
+                ForEach(postImages, id: \.self) { num in
+                    Image(uiImage: num)
+                        .resizable()
+                        .scaledToFill()
+                        .onTapGesture(count: 2) {
+                            if !post.likedByUser {
+                                likePost()
+                                AnalyticsService.instance.likePostDoubleTap()
+                                
+                            }
+                        }
                 }
+            }
+            .tabViewStyle(.page)
+            .frame(height: 300)
             if addHeartAnimationToView && post.likedByUser {
                 LIkeAnimationView(animate: $animateLike)
             }
@@ -184,7 +188,9 @@ extension PostView {
             }.accentColor(post.likedByUser ? .red : .primary).alert(isPresented: $showApproveAlert) {
                 return Alert(title: Text("Approve deleting"), message: Text("You definitely want to delete this post?"), primaryButton: .default(Text("Yes"), action: {
                     DataService.instance.deletePost(postID: post.postID)
+                
                     handler()
+                    
                 }), secondaryButton: .cancel())
             }
             NavigationLink {
@@ -331,7 +337,7 @@ extension PostView {
     }
     func sharePost() {
         let message = "Check out this post on DogGram!"
-        let image = postImage
+        let image = postImages[0]
         let link = URL(string: "https://www.google.com")!
         let activityViewController = UIActivityViewController(activityItems: [message, image, link], applicationActivities: nil)
         let viewController = UIApplication.shared.windows.first?.rootViewController
