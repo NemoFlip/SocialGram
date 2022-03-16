@@ -20,6 +20,7 @@
 		E11030B5279EFBC2009CFC60 /* CommentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E11030B4279EFBC2009CFC60 /* CommentsView.swift */; };
 		E11030B7279F0184009CFC60 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E11030B6279F0184009CFC60 /* MessageView.swift */; };
 		E11030B9279F026D009CFC60 /* CommentsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E11030B8279F026D009CFC60 /* CommentsModel.swift */; };
+		E115FA6027E1BC550023BCBB /* MultipleImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E115FA5F27E1BC550023BCBB /* MultipleImagePicker.swift */; };
 		E11B053827BC04BF00652783 /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E11B053727BC04BF00652783 /* DataService.swift */; };
 		E11B795527A7B77900A84B3A /* SettingsEditTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E11B795427A7B77900A84B3A /* SettingsEditTextView.swift */; };
 		E121E5C327CE4B8800115B06 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E121E5C227CE4B8800115B06 /* AnalyticsService.swift */; };
@@ -71,6 +72,7 @@
 		E11030B4279EFBC2009CFC60 /* CommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsView.swift; sourceTree = "<group>"; };
 		E11030B6279F0184009CFC60 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		E11030B8279F026D009CFC60 /* CommentsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsModel.swift; sourceTree = "<group>"; };
+		E115FA5F27E1BC550023BCBB /* MultipleImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipleImagePicker.swift; sourceTree = "<group>"; };
 		E11B053727BC04BF00652783 /* DataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataService.swift; sourceTree = "<group>"; };
 		E11B795427A7B77900A84B3A /* SettingsEditTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsEditTextView.swift; sourceTree = "<group>"; };
 		E121E5C227CE4B8800115B06 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
@@ -241,6 +243,7 @@
 				E10A5C7227A06CE100D01973 /* ImageGridView.swift */,
 				E10B05BB27A2AE8400B5204C /* ImagePicker.swift */,
 				E1D8E5AB27D493AB008E1903 /* PullToRefreshVIew.swift */,
+				E115FA5F27E1BC550023BCBB /* MultipleImagePicker.swift */,
 			);
 			path = Subviews;
 			sourceTree = "<group>";
@@ -389,6 +392,7 @@
 				E1F58CDD27B5630700E05FA4 /* AuthService.swift in Sources */,
 				E1D9C7F327AE7FA600FAF2C7 /* LIkeAnimationView.swift in Sources */,
 				E1B70D6527A70A9C007E13DC /* SettingsRowView.swift in Sources */,
+				E115FA6027E1BC550023BCBB /* MultipleImagePicker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

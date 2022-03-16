@@ -12,6 +12,8 @@ struct PostImageView: View {
     @Environment(\.colorScheme) var colorScheme
     @State var showAlert = false
     @State var postUploadedSuccessfully = false
+    @State var showMultipleImagePicker = false
+    @State var multipleImages: [UIImage] = []
     @State private var captionText: String = ""
     @Binding var imageSelected: UIImage
     @AppStorage(CurrentUserDefaults.userID) var currentUserID: String?
@@ -67,7 +69,18 @@ extension PostImageView {
                     .padding()
             }.accentColor(.primary)
             Spacer()
+            plusButtton
         }
+    }
+    private var plusButtton: some View {
+        Button {
+            self.showMultipleImagePicker.toggle()
+        } label: {
+            Image(systemName: "plus")
+                .font(.title)
+                .padding()
+        }.accentColor(.primary)
+
     }
     private var imageWithEditor: some View {
         HStack {
