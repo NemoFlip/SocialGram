@@ -64,7 +64,7 @@ class PostArrayObject: ObservableObject {
     }
     func getPostsForUser(userID: String) {
         DispatchQueue.global(qos: .userInitiated).async {
-            DataService.instance.downloadPostForUser(userID: userID) { posts in
+            DataService.instance.downloadPostForUser(userID: userID) {[self] posts in
                 if (posts.count != self.dataArray.count) {
                     self.dataArray = []
                     DispatchQueue.main.async {

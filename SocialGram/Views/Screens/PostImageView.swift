@@ -86,7 +86,7 @@ extension PostImageView {
         .accentColor(.primary)
         .sheet(isPresented: $showMultipleImagePicker, onDismiss: {
             if !multipleImages.contains(imageSelected) {
-                multipleImages.append(imageSelected)
+                multipleImages.insert(imageSelected, at: 0)
             }
         }) {
             MultipleImagePicker(images: $multipleImages, dismissView: $showMultipleImagePicker)

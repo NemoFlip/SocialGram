@@ -35,7 +35,46 @@ struct PostView: View {
                 headerSection
             }
             
-            imageSection
+            if showHeaderAndFooter {
+                 ZStack {
+                    TabView {
+                        ForEach(postImages, id: \.self) { num in
+                            Image(uiImage: num)
+                                .resizable()
+                                .scaledToFill()
+                                .onTapGesture(count: 2) {
+                                    if !post.likedByUser {
+                                        likePost()
+                                        AnalyticsService.instance.likePostDoubleTap()
+                                        
+                                    }
+                                }
+                        }
+                    }
+                    .tabViewStyle(.page)
+                    .frame(height: 300)
+                    if addHeartAnimationToView && post.likedByUser {
+                        LIkeAnimationView(animate: $animateLike)
+                    }
+                 }
+                
+            } else {
+                ZStack {
+                            Image(uiImage: postImages[0])
+                                .resizable()
+                                .scaledToFit()
+                                .onTapGesture(count: 2) {
+                                    if !post.likedByUser {
+                                        likePost()
+                                        AnalyticsService.instance.likePostDoubleTap()
+                                        
+                                    }
+                                }
+                            if addHeartAnimationToView && post.likedByUser {
+                                LIkeAnimationView(animate: $animateLike)
+                            }
+                }
+            }
             if showHeaderAndFooter {
                 footerSection
                 if let caption = post.caption {
@@ -98,7 +137,7 @@ struct PostView: View {
             }
         }
         print("GETTING IMAGES")
-        ImageManager.instance.downloadMultiplePostImages(postID: post.postID) { uiImages in
+        ImageManager.instance.downloadMultiplePostImages(postID: post.postID, showHeaderAndFooter: showHeaderAndFooter) { uiImages in
             self.postImages = uiImages
         }  
     }
@@ -148,29 +187,6 @@ extension PostView {
                 getActionSheet()
             }
         }.padding(6)
-    }
-    private var imageSection: some View {
-        ZStack {
-            TabView {
-                ForEach(postImages, id: \.self) { num in
-                    Image(uiImage: num)
-                        .resizable()
-                        .scaledToFill()
-                        .onTapGesture(count: 2) {
-                            if !post.likedByUser {
-                                likePost()
-                                AnalyticsService.instance.likePostDoubleTap()
-                                
-                            }
-                        }
-                }
-            }
-            .tabViewStyle(.page)
-            .frame(height: 300)
-            if addHeartAnimationToView && post.likedByUser {
-                LIkeAnimationView(animate: $animateLike)
-            }
-        }
     }
     private var footerSection: some View {
         

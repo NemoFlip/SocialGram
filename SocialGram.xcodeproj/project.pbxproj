@@ -126,8 +126,8 @@
 		E13496F1279DC4F100FD299C /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				E13496F2279DC4FE00FD299C /* PostModel.swift */,
 				E11030B8279F026D009CFC60 /* CommentsModel.swift */,
+				E13496F2279DC4FE00FD299C /* PostModel.swift */,
 				E13496F4279DC86D00FD299C /* PostArrayObject.swift */,
 			);
 			path = Models;

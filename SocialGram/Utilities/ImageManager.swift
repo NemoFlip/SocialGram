@@ -49,34 +49,46 @@ class ImageManager {
             }
         }
     }
-    func downloadMultiplePostImages(postID: String, handler: @escaping (_ uiImages: [UIImage]) -> ()) {
-        var resultArray = [UIImage]()
-        let myGroup = DispatchGroup()
-        print("Downloading")
-        for i in 1...5 {
-            myGroup.enter()
-            let path = getPostImagesPath(postID: postID, num: i)
-            DispatchQueue.global(qos: .userInitiated).async {
-                if let cachedImage = imageCache.object(forKey: path) {
-                    resultArray.append(cachedImage)
-                    myGroup.leave()
-                } else {
-                    path.getData(maxSize: 27 * 1024 * 1024) { returnedImageData, error in
-                        if let data = returnedImageData, let image = UIImage(data: data) {
-                            imageCache.setObject(image, forKey: path)
-                            resultArray.append(image)
-                        }
+    func downloadMultiplePostImages(postID: String, showHeaderAndFooter: Bool, handler: @escaping (_ uiImages: [UIImage]) -> ()) {
+        if showHeaderAndFooter {
+            var resultArray = [UIImage]()
+            let myGroup = DispatchGroup()
+            print("Downloading")
+            for i in 1...5 {
+                myGroup.enter()
+                let path = getPostImagesPath(postID: postID, num: i)
+                DispatchQueue.global(qos: .userInitiated).async {
+                    if let cachedImage = imageCache.object(forKey: path) {
+                        resultArray.append(cachedImage)
                         myGroup.leave()
+                    } else {
+                        path.getData(maxSize: 27 * 1024 * 1024) { returnedImageData, error in
+                            if let data = returnedImageData, let image = UIImage(data: data) {
+                                imageCache.setObject(image, forKey: path)
+                                resultArray.append(image)
+                            }
+                            myGroup.leave()
+                        }
                     }
                 }
-            }
             
-        }
-        
-        myGroup.notify(queue: .main) {
-            print("ARRAY")
-            print(resultArray)
-            handler(resultArray)
+            }
+            myGroup.notify(queue: .main) {
+                print("ARRAY")
+                print(resultArray)
+                    handler(resultArray)
+                
+            }
+        } else {
+            let path = getPostImagesPath(postID: postID, num: 1)
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.downloadImage(path: path) { image in
+                        DispatchQueue.main.async {
+                            handler([image ?? UIImage(named: "logo.loading")!])
+                        }
+                       
+                }
+            }
         }
     }
     private func getProfileImagePath(userID: String) -> StorageReference {
@@ -84,11 +96,6 @@ class ImageManager {
         let storagePath = REF_STOR.reference(withPath: userPath)
         return storagePath
     }
-//    private func getPostImagePath(postID: String) -> StorageReference {
-//        let postPath = "posts/\(postID)/1"
-//        let storagePath = REF_STOR.reference(withPath: postPath)
-//        return storagePath
-//    }
     private func getPostImagesPath(postID: String, num: Int) -> StorageReference {
         let postPath = "posts/\(postID)/\(num)"
         let storagePath = REF_STOR.reference(withPath: postPath)
