@@ -15,3 +15,4 @@ struct LazyView<Content: View>: View {
         self.content()
     }
 }
+

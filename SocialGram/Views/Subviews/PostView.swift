@@ -24,6 +24,7 @@ struct PostView: View {
     @State var showAlert = false
     @State var showApproveAlert = false
     var handler: () -> ()
+    @State var currentZoomAmount: CGFloat = .zero
     enum PostActionSheetOption {
         case generalForCurrentUser
         case generalForPostUser
@@ -42,6 +43,11 @@ struct PostView: View {
                             Image(uiImage: num)
                                 .resizable()
                                 .scaledToFill()
+                                
+                                .scaleEffect(1 + currentZoomAmount)
+                                .gesture(
+                                   addGesture()
+                                )
                                 .onTapGesture(count: 2) {
                                     if !post.likedByUser {
                                         likePost()
@@ -62,7 +68,7 @@ struct PostView: View {
                 ZStack {
                             Image(uiImage: postImages[0])
                                 .resizable()
-                                .scaledToFit()
+                                .scaledToFit()    
                                 .onTapGesture(count: 2) {
                                     if !post.likedByUser {
                                         likePost()
@@ -154,6 +160,21 @@ struct PostView_Previews: PreviewProvider {
     }
 }
 extension PostView {
+    private func addGesture() -> _EndedGesture<_ChangedGesture<MagnificationGesture>> {
+        MagnificationGesture()
+            .onChanged{ value in
+                if value < 1 {
+                    self.currentZoomAmount = 0
+                } else {
+                    self.currentZoomAmount = value - 1
+                }
+            }
+            .onEnded({ _ in
+                withAnimation(.spring()) {
+                    self.currentZoomAmount = 0
+                }
+            })
+    }
     private var headerSection: some View {
         HStack {
             NavigationLink {
