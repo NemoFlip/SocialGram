@@ -43,7 +43,6 @@ struct PostView: View {
                             Image(uiImage: num)
                                 .resizable()
                                 .scaledToFill()
-                                
                                 .scaleEffect(1 + currentZoomAmount)
                                 .gesture(
                                    addGesture()
